@@ -12,10 +12,12 @@ namespace dotnetrdf_connector
         private string serverID;
         private string repositoryID;
         private BaseSesameHttpProtocolConnector connection;
-        public RDFConnector(string serverID, string repositoryID)
+        private string ns;
+        public RDFConnector(string serverID, string repositoryID, string ns)
         {
             this.serverID = serverID;
             this.repositoryID = repositoryID;
+            this.ns = ns;
             connection = new SesameHttpProtocolConnector(serverID, repositoryID);
         }
 
@@ -53,8 +55,6 @@ namespace dotnetrdf_connector
         public void listAllNamedGraphs()
         {
             // Get all graphs in storeID
-
-            // Get storeID at serverID
             IEnumerable<Uri> graph_list = listGraphs_modified(connection);
             if (graph_list.Count<Uri>() == 0)
             {
@@ -109,16 +109,28 @@ namespace dotnetrdf_connector
             return g;
         }
 
-        public void addStatements(List<TripleStructure> triples, string graphName)
+        public void AddStatements(List<TripleStructure> triples, string graphName)
         {
-            Graph g = loadGraph(graphName);
+            Graph g;
+            try
+            {
+                g = loadGraph(ns + graphName);
+            }
+            catch (System.UriFormatException ex)
+            {
+                // No graph was found named graphName, create new graph
+                g = new Graph();
+                g.BaseUri = UriFactory.Create(ns + graphName);
+            }
             foreach (TripleStructure t in triples)
             {
-                IUriNode subject = g.CreateUriNode(UriFactory.Create(t.subject));
-                IUriNode predicate = g.CreateUriNode(UriFactory.Create(t.predicate));
-                ILiteralNode objectL = g.CreateLiteralNode(t.objectL);
+                IUriNode subject = g.CreateUriNode(UriFactory.Create(ns + t.subject));
+                IUriNode predicate = g.CreateUriNode(UriFactory.Create(ns + t.predicate));
+                ILiteralNode objectL = g.CreateLiteralNode(ns + t.objectL);
                 g.Assert(new Triple(subject, predicate, objectL));
             }
+
+            connection.SaveGraph(g);
         }
     }
 }
