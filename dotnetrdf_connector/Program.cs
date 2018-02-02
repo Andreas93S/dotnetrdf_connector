@@ -17,9 +17,9 @@ namespace dotnetrdf_connector
 
             // Create some simple statements
             List<TripleStructure> tripleList = new List<TripleStructure>();
-            tripleList.Add(new TripleStructure("skill1", "hasAction", "action1"));
-            tripleList.Add(new TripleStructure("skill2", "hasAction", "action1"));
-            rdfConn.AddStatements(tripleList, "temp_graph");
+            tripleList.Add(new TripleStructure("skill1", "hasAction", "action1", true));
+            tripleList.Add(new TripleStructure("skill2", "hasAction", "action1", true));
+            rdfConn.AddStatements(tripleList, "skills");
 
             Console.ReadLine();
         }

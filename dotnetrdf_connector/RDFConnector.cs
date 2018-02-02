@@ -111,6 +111,7 @@ namespace dotnetrdf_connector
 
         public void AddStatements(List<TripleStructure> triples, string graphName)
         {
+            Console.WriteLine("Adding statements to " + repositoryID + "...");
             Graph g;
             try
             {
@@ -131,6 +132,8 @@ namespace dotnetrdf_connector
             }
 
             connection.SaveGraph(g);
+            Console.WriteLine("Done");
+
         }
     }
 }
